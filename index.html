@@ -185,7 +185,7 @@ text-shadow:
 .btn-continue{
 
 position:fixed;
-top:55%;
+top:45%;
 left:50%;
 transform:translate(-50%,-50%);
 
@@ -196,18 +196,28 @@ border:none;
 
 color:#ffe9b8;
 
-font-size:1.5rem;
-letter-spacing:0.25em;
+font-size:1.8rem;
+letter-spacing:0.3em;
 
 cursor:pointer;
 
 text-shadow:
-0 0 20px rgba(255,230,170,0.9),
-0 0 40px rgba(255,200,120,0.6);
+0 0 20px rgba(255,230,170,1),
+0 0 40px rgba(255,200,120,0.9),
+0 0 80px rgba(255,190,80,0.7);
 
 opacity:0;
-transition:opacity 1.8s;
 
+transition:opacity 2s;
+
+animation:shine 4s infinite;
+
+}
+
+@keyframes shine{
+0%{text-shadow:0 0 10px rgba(255,230,170,0.5);}
+50%{text-shadow:0 0 40px rgba(255,220,150,1),0 0 80px rgba(255,200,120,0.8);}
+100%{text-shadow:0 0 10px rgba(255,230,170,0.5);}
 }
 
 .btn-continue.visible{
@@ -250,12 +260,12 @@ display:none;
 <p>Laissant un peu de nous dans chaque recoin,</p>
 <p>pour que le rêve tienne debout.</p>
 
-<p>Ceux qui tombent </p>
+<p>Ceux qui tombent</p>
 <p>ne tombent jamais seuls.</p>
 
 <p>Fiers d'un orgueil que rien n'efface.</p>
 
-<p>Et puis la rumeur commença à gronder </p>
+<p>Et puis la rumeur commença à gronder</p>
 <p>jusqu'à ce que l'artiste franchisse</p>
 <p>le cercle incandescent.</p>
 
@@ -264,7 +274,7 @@ display:none;
 </div>
 </div>
 
-<button class="btn-continue" id="btnContinue">go on?</button>
+<button class="btn-continue" id="btnContinue" onclick="window.location.href='page2.html'">go on?</button>
 
 <script>
 
@@ -295,6 +305,8 @@ crawl.style.animation=`crawl ${crawlDuration}s linear -5s forwards`
 
 audio.play().catch(()=>{})
 
+/* fade out */
+
 setTimeout(()=>{
 
 const fadeStartTime=Date.now()
@@ -310,7 +322,6 @@ if(progress<1){
 requestAnimationFrame(fade)
 }else{
 audio.volume=0
-audio.pause()
 }
 
 }
@@ -318,6 +329,8 @@ audio.pause()
 fade()
 
 },fadeStart*1000)
+
+/* apparition bouton */
 
 setTimeout(()=>{
 btn.classList.add("visible")
