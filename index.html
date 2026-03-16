@@ -57,7 +57,7 @@ background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256'%3E%3Cfilte
 background-size:150px;
 }
 
-/* bouton */
+/* bouton my world */
 
 .invitation{
 position:fixed;
@@ -189,8 +189,9 @@ text-shadow:
 .btn-continue{
 
 position:fixed;
-bottom:32px;
-right:42px;
+top:66%;
+left:50%;
+transform:translate(-50%,-50%);
 
 background:transparent;
 border:none;
@@ -248,12 +249,12 @@ display:none;
 <p>Laissant un peu de nous dans chaque recoin,</p>
 <p>pour que le rêve tienne debout.</p>
 
-<p>Ceux qui tombent ensemble</p>
+<p>Ceux qui tombent </p>
 <p>ne tombent jamais seuls.</p>
 
 <p>Fiers d'un orgueil que rien n'efface.</p>
 
-<p>Et puis la rumeur commença à gronder —</p>
+<p>Et puis la rumeur commença à gronder </p>
 <p>jusqu'à ce que l'artiste franchisse</p>
 <p>le cercle incandescent.</p>
 
@@ -273,8 +274,8 @@ const crawl=document.getElementById("crawl")
 const btn=document.getElementById("btnContinue")
 
 const crawlDuration = 110
-const fadeStart = 35
-const fadeDuration = 18
+const fadeStart = 36
+const fadeDuration = 8
 
 let started=false
 
@@ -291,8 +292,9 @@ crawl.style.animation="none";
 crawl.offsetHeight;
 crawl.style.animation=`crawl ${crawlDuration}s linear -5s forwards`
 
-
 audio.play().catch(()=>{})
+
+/* fade out */
 
 setTimeout(()=>{
 
@@ -317,6 +319,8 @@ audio.pause()
 fade()
 
 },fadeStart*1000)
+
+/* apparition bouton go on */
 
 setTimeout(()=>{
 btn.classList.add("visible")
