@@ -149,7 +149,7 @@ text-shadow:
 0 0 40px rgba(255,200,120,0.9),
 0 0 80px rgba(255,190,80,0.7);
 opacity:0;
-transition:opacity 3s;
+transition:opacity 3s;        /* modifié à 3 secondes */
 animation:shine 4s infinite;
 }
 @keyframes shine{
@@ -203,13 +203,14 @@ display:none;
 <script>
 const invitation = document.getElementById("invitation")
 const scene = document.getElementById("scene")
-const audioElement = document.getElementById("introAudio") // conservé mais non utilisé
+const audioElement = document.getElementById("introAudio")
 const crawl = document.getElementById("crawl")
 const btn = document.getElementById("btnContinue")
 
-const crawlDuration = 110          // durée de l'animation du texte
-const fadeStart = 36                // début du fondu audio (secondes)
-const fadeDuration = 15             // durée du fondu (de 36 à 51s)
+const crawlDuration = 110          // durée de l'animation du texte (inchangée)
+const fadeStart = 36                // début du fondu audio
+const fadeDuration = 15             // durée du fondu
+const buttonAppearTime = 46         // ⬅️ apparition du bouton à 46 secondes
 
 let started = false
 let fadeStarted = false
@@ -234,7 +235,6 @@ function startExperience() {
   // Initialisation de l'API Web Audio
   audioContext = new (window.AudioContext || window.webkitAudioContext)()
   
-  // Noeud de gain (volume)
   gainNode = audioContext.createGain()
   gainNode.gain.value = 1
   gainNode.connect(audioContext.destination)
@@ -247,19 +247,17 @@ function startExperience() {
       source = audioContext.createBufferSource()
       source.buffer = buffer
       source.connect(gainNode)
-      
       source.start(0)
       
-      // Surveillance du temps écoulé
       const startTime = audioContext.currentTime
       checkTime(startTime)
     })
     .catch(e => console.error('Erreur lecture audio:', e))
 
-  // Apparition du bouton "go on?" à la fin de l'animation du texte (110s)
+  // Apparition du bouton "go on?" après buttonAppearTime secondes
   setTimeout(() => {
-  btn.classList.add("visible")
-}, buttonAppearTime * 800)
+    btn.classList.add("visible")
+  }, buttonAppearTime * 1000)
 }
 
 function checkTime(startTime) {
@@ -268,25 +266,21 @@ function checkTime(startTime) {
     
     const elapsed = audioContext.currentTime - startTime
     
-    // Déclenchement du fondu audio
     if (!fadeStarted && elapsed >= fadeStart) {
       fadeStarted = true
       clearInterval(checkInterval)
       
-      // Début du fondu
       const fadeStartTime = audioContext.currentTime
       const targetTime = fadeStartTime + fadeDuration
       
       function fadeLoop() {
         const now = audioContext.currentTime
         if (now >= targetTime) {
-          // Fin du fondu : volume à 0 et arrêt
           gainNode.gain.value = 0
           if (source) source.stop()
           return
         }
         
-        // Calcul linéaire du gain (de 1 à 0)
         const progress = (now - fadeStartTime) / fadeDuration
         gainNode.gain.value = 1 - progress
         
@@ -295,7 +289,7 @@ function checkTime(startTime) {
       
       requestAnimationFrame(fadeLoop)
     }
-  }, 100) // Vérification toutes les 100ms
+  }, 100)
 }
 
 invitation.addEventListener("click", startExperience)
