@@ -278,68 +278,77 @@ display:none;
 
 <script>
 
-const invitation=document.getElementById("invitation")
-const scene=document.getElementById("scene")
-const audio=document.getElementById("introAudio")
-const crawl=document.getElementById("crawl")
-const btn=document.getElementById("btnContinue")
+const invitation = document.getElementById("invitation")
+const scene = document.getElementById("scene")
+const audio = document.getElementById("introAudio")
+const crawl = document.getElementById("crawl")
+const btn = document.getElementById("btnContinue")
 
 const crawlDuration = 110
-const fadeStart = 36
-const fadeDuration = 8
+const fadeStart = 36           // début du fondu (secondes)
+const fadeDuration = 12         // durée du fondu (modifiable entre 10 et 15)
 
-let started=false
+let started = false
+let fadeTimer = null           // pour pouvoir annuler si besoin
 
-function startExperience(){
+function startExperience() {
+  if (started) return
+  started = true
 
-if(started) return
-started=true
+  invitation.style.display = "none"
 
-invitation.style.display="none"
+  scene.classList.add("active")
 
-scene.classList.add("active")
+  // Force le redémarrage de l'animation
+  crawl.style.animation = "none"
+  crawl.offsetHeight // reflow
+  crawl.style.animation = `crawl ${crawlDuration}s linear -5s forwards`
 
-crawl.style.animation="none";
-crawl.offsetHeight;
-crawl.style.animation=`crawl ${crawlDuration}s linear -5s forwards`
+  audio.play().catch(() => {})
 
-audio.play().catch(()=>{})
+  // Planifier le début du fondu
+  setTimeout(() => {
+    // Si l'audio est déjà fini ou en pause, on ne fait rien
+    if (audio.paused || audio.ended) return
 
-/* fade out */
+    const initialVolume = audio.volume
+    const startTime = performance.now() // référence précise
 
-setTimeout(()=>{
+    function fadeOut(now) {
+      // Si l'audio a été mis en pause ou est fini pendant le fondu, on arrête
+      if (audio.paused || audio.ended) {
+        audio.volume = initialVolume // on remet le volume par défaut
+        return
+      }
 
-const fadeStartTime=Date.now()
+      const elapsed = (now - startTime) / 1000
+      const progress = Math.min(elapsed / fadeDuration, 1)
+      // volume décroît de 1 à 0
+      audio.volume = Math.max(0, 1 - progress)
 
-function fade(){
+      if (progress < 1) {
+        // continue le fondu
+        requestAnimationFrame(fadeOut)
+      } else {
+        // fin du fondu : on met en pause et on réinitialise le volume pour une prochaine écoute
+        audio.pause()
+        audio.volume = 1
+      }
+    }
 
-const elapsed=(Date.now()-fadeStartTime)/1000
-const progress=Math.min(elapsed/fadeDuration,1)
+    // Lance la première frame
+    requestAnimationFrame(fadeOut)
+  }, fadeStart * 1000)
 
-audio.volume=1-progress
-
-if(progress<1){
-requestAnimationFrame(fade)
-}else{
-audio.volume=0
+  // Apparition du bouton "go on?" après (fadeStart + fadeDuration) secondes
+  setTimeout(() => {
+    btn.classList.add("visible")
+  }, (fadeStart + fadeDuration) * 1000)
 }
 
-}
-
-fade()
-
-},fadeStart*1000)
-
-/* apparition bouton */
-
-setTimeout(()=>{
-btn.classList.add("visible")
-},(fadeStart+fadeDuration)*1000)
-
-}
-
-invitation.addEventListener("click",startExperience)
-invitation.addEventListener("touchstart",startExperience)
+// Évite les doubles déclenchements sur mobile
+invitation.addEventListener("click", startExperience)
+invitation.addEventListener("touchstart", startExperience)
 
 </script>
 
