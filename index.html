@@ -26,19 +26,13 @@ background-size:cover;
 background-position:center;
 z-index:0;
 filter:grayscale(30%) contrast(1.1) brightness(0.9);
-animation: breathe 60s ease-in-out infinite alternate;
+animation: zoomIn 110s ease-out forwards; /* ease-out pour une progression douce */
 }
-@keyframes breathe {
+@keyframes zoomIn {
   0% {
-    background-position: 48% 48%;
-    transform: scale(1);
-  }
-  50% {
-    background-position: 52% 52%;
-    transform: scale(1.02);
+    transform: scale(0.98);
   }
   100% {
-    background-position: 48% 52%;
     transform: scale(1);
   }
 }
@@ -177,18 +171,17 @@ pointer-events: auto;
 50%{text-shadow:0 0 40px rgba(255,220,150,1),0 0 80px rgba(255,200,120,0.8);}
 100%{text-shadow:0 0 10px rgba(255,230,170,0.5);}
 }
-/* Étoile filante plus légère */
+/* Étoile filante très légère */
 .shooting-star {
   position: fixed;
   width: 2px;
   height: 2px;
   background: white;
   border-radius: 50%;
-  box-shadow: 0 0 15px 3px rgba(255,255,255,0.7);
+  box-shadow: 0 0 8px 2px rgba(255,255,255,0.6), 15px 5px 12px -5px rgba(255,255,255,0.3);
   z-index: 15;
   pointer-events: none;
   opacity: 0;
-  transform: rotate(0deg);
 }
 .shooting-star.active {
   opacity: 1;
@@ -198,22 +191,17 @@ pointer-events: auto;
   0% {
     left: 50%;
     top: 5%;
-    width: 2px;
-    height: 2px;
-    box-shadow: 0 0 15px 3px white;
+    opacity: 1;
+    box-shadow: 0 0 8px 2px rgba(255,255,255,0.6), 0 0 0 0 transparent;
   }
   30% {
-    width: 40px;
-    height: 1px;
-    box-shadow: 0 0 25px 5px white;
+    box-shadow: 0 0 12px 3px rgba(255,255,255,0.7), 25px 8px 15px -5px rgba(255,255,255,0.4);
   }
   100% {
     left: 60%;
     top: 15%;
-    width: 2px;
-    height: 2px;
-    box-shadow: 0 0 15px 3px white;
     opacity: 0;
+    box-shadow: 0 0 5px 1px rgba(255,255,255,0.4), 40px 15px 20px -8px rgba(255,255,255,0.2);
   }
 }
 audio{
