@@ -6,15 +6,11 @@
 <title>Dans l'ombre — my world</title>
 <link rel="icon" type="image/jpeg" href="icone.jpeg">
 <link rel="apple-touch-icon" href="icone.jpeg">
-
-<!-- Polices Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet">
-
 <style>
-/* Tous les styles de base */
 *{margin:0;padding:0;box-sizing:border-box;}
 body{
 height:100vh;
@@ -30,6 +26,27 @@ background-size:cover;
 background-position:center;
 z-index:0;
 filter:grayscale(30%) contrast(1.1) brightness(0.9);
+/* Animation de balancement avec amplitude visible */
+animation: breathe 60s ease-in-out infinite alternate;
+}
+@keyframes breathe {
+  0% { background-position: 45% 45%; }
+  100% { background-position: 55% 55%; }
+}
+/* Témoin visuel (carré coloré) pour vérifier l'animation */
+.witness {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 30px;
+  height: 30px;
+  background-color: red;
+  z-index: 100;
+  animation: witnessAnim 60s ease-in-out infinite alternate;
+}
+@keyframes witnessAnim {
+  0% { background-color: red; }
+  100% { background-color: green; }
 }
 .overlay{
 position:fixed;
@@ -154,15 +171,58 @@ text-shadow:
 opacity:0;
 transition:opacity 4s;
 animation:shine 4s infinite;
-z-index:10; /* ← AJOUT CRUCIAL */
+z-index:10;
+pointer-events: none;
+}
+.btn-continue.visible{
+opacity:1;
+pointer-events: auto;
 }
 @keyframes shine{
 0%{text-shadow:0 0 10px rgba(255,230,170,0.5);}
 50%{text-shadow:0 0 40px rgba(255,220,150,1),0 0 80px rgba(255,200,120,0.8);}
 100%{text-shadow:0 0 10px rgba(255,230,170,0.5);}
 }
-.btn-continue.visible{
-opacity:1;
+/* Étoile filante */
+.shooting-star {
+  position: fixed;
+  top: -10%;
+  left: -10%;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 20px 5px rgba(255,255,255,0.9);
+  z-index: 15;
+  pointer-events: none;
+  opacity: 0;
+  transform: rotate(45deg);
+}
+.shooting-star.active {
+  opacity: 1;
+  animation: shoot 2.5s linear forwards;
+}
+@keyframes shoot {
+  0% {
+    left: -10%;
+    top: -10%;
+    width: 4px;
+    height: 4px;
+    box-shadow: 0 0 20px 5px white;
+  }
+  20% {
+    width: 100px;
+    height: 2px;
+    box-shadow: 0 0 40px 10px white;
+  }
+  100% {
+    left: 110%;
+    top: 110%;
+    width: 4px;
+    height: 4px;
+    box-shadow: 0 0 20px 5px white;
+    opacity: 0;
+  }
 }
 audio{
 display:none;
@@ -170,17 +230,18 @@ display:none;
 </style>
 </head>
 <body>
-
 <div class="background"></div>
 <div class="overlay"></div>
 <div class="grain"></div>
+<!-- Témoin visuel (à supprimer plus tard) -->
+<div class="witness"></div>
+<!-- Étoile filante -->
+<div class="shooting-star" id="shootingStar"></div>
 
 <button class="invitation" id="invitation">my world</button>
-
 <audio id="introAudio" preload="auto" style="display:none">
 <source src="musique_intro.mp3" type="audio/mpeg">
 </audio>
-
 <div class="scene" id="scene">
 <div class="crawl-wrapper" id="crawl">
 <p>Longtemps avant que le monde ne s'allume…</p>
@@ -201,27 +262,25 @@ display:none;
 <p class="final">Et le monde s'embrase.</p>
 </div>
 </div>
-
 <button class="btn-continue" id="btnContinue" onclick="window.location.href='p1.html'">
 go on?
 </button>
-
 <script>
 const invitation = document.getElementById("invitation")
 const scene = document.getElementById("scene")
 const audioElement = document.getElementById("introAudio")
 const crawl = document.getElementById("crawl")
 const btn = document.getElementById("btnContinue")
+const shootingStar = document.getElementById("shootingStar")
 
-const crawlDuration = 110          // durée de l'animation du texte
-const fadeStart = 36                // début du fondu audio
-const fadeDuration = 15             // durée du fondu
-const buttonAppearTime = 45         // apparition du bouton à 45 secondes
+const crawlDuration = 110
+const fadeStart = 36
+const fadeDuration = 15
+const buttonAppearTime = 45
+const shootingStarTime = 20 // secondes (modifiable)
 
 let started = false
 let fadeStarted = false
-
-// Variables pour l'API Web Audio
 let audioContext = null
 let gainNode = null
 let source = null
@@ -233,19 +292,15 @@ function startExperience() {
   invitation.style.display = "none"
   scene.classList.add("active")
 
-  // Animation du texte
   crawl.style.animation = "none"
   crawl.offsetHeight
   crawl.style.animation = `crawl ${crawlDuration}s linear -5s forwards`
 
-  // Initialisation de l'API Web Audio
   audioContext = new (window.AudioContext || window.webkitAudioContext)()
-  
   gainNode = audioContext.createGain()
   gainNode.gain.value = 1
   gainNode.connect(audioContext.destination)
 
-  // Chargement et lecture du fichier audio
   fetch('musique_intro.mp3')
     .then(response => response.arrayBuffer())
     .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
@@ -254,31 +309,35 @@ function startExperience() {
       source.buffer = buffer
       source.connect(gainNode)
       source.start(0)
-      
       const startTime = audioContext.currentTime
       checkTime(startTime)
     })
     .catch(e => console.error('Erreur lecture audio:', e))
 
-  // Apparition du bouton "go on?" après buttonAppearTime secondes
+  // Apparition du bouton "go on?"
   setTimeout(() => {
     btn.classList.add("visible")
   }, buttonAppearTime * 1000)
+
+  // Étoile filante
+  setTimeout(() => {
+    shootingStar.classList.add('active')
+    // Retirer la classe après l'animation (2.5s)
+    setTimeout(() => {
+      shootingStar.classList.remove('active')
+    }, 2500)
+  }, shootingStarTime * 1000)
 }
 
 function checkTime(startTime) {
   const checkInterval = setInterval(() => {
     if (!audioContext) return
-    
     const elapsed = audioContext.currentTime - startTime
-    
     if (!fadeStarted && elapsed >= fadeStart) {
       fadeStarted = true
       clearInterval(checkInterval)
-      
       const fadeStartTime = audioContext.currentTime
       const targetTime = fadeStartTime + fadeDuration
-      
       function fadeLoop() {
         const now = audioContext.currentTime
         if (now >= targetTime) {
@@ -286,13 +345,10 @@ function checkTime(startTime) {
           if (source) source.stop()
           return
         }
-        
         const progress = (now - fadeStartTime) / fadeDuration
         gainNode.gain.value = 1 - progress
-        
         requestAnimationFrame(fadeLoop)
       }
-      
       requestAnimationFrame(fadeLoop)
     }
   }, 100)
@@ -301,6 +357,5 @@ function checkTime(startTime) {
 invitation.addEventListener("click", startExperience)
 invitation.addEventListener("touchstart", startExperience)
 </script>
-
 </body>
 </html>
