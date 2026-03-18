@@ -17,8 +17,6 @@ font-family:'Marcellus',serif;
 overflow:hidden;
 }
 
-/* IMAGE PLEIN ÉCRAN */
-
 .image-container{
 position:fixed;
 inset:0;
@@ -34,30 +32,51 @@ max-height:100%;
 object-fit:contain;
 }
 
-/* BOUTON SUIVANT */
+/* NAV */
 
-.next-btn{
+.nav{
 position:fixed;
-bottom:30px;
-right:40px;
-
-background:transparent;
-border:none;
-border-bottom:1px solid rgba(255,230,180,0.4);
-
-color:rgba(255,230,180,0.7);
-
-font-size:1rem;
-letter-spacing:0.3em;
-
-cursor:pointer;
-
-transition:all 0.3s ease;
+bottom:25px;
+left:0;
+width:100%;
+display:flex;
+justify-content:flex-end;
+align-items:center;
+padding:0 40px;
 }
 
-.next-btn:hover{
+/* NEXT */
+
+.nav-btn{
+color:rgba(255,230,180,0.5);
+font-size:1rem;
+letter-spacing:0.3em;
+cursor:pointer;
+transition:0.3s;
+}
+
+.nav-btn:hover{
 color:#ffe9b8;
-border-bottom-color:#ffe9b8;
+}
+
+/* NUMÉROS */
+
+.nav-center{
+position:absolute;
+left:50%;
+transform:translateX(-50%);
+color:rgba(255,230,180,0.4);
+font-size:0.9rem;
+letter-spacing:0.4em;
+}
+
+.nav-center span{
+cursor:pointer;
+transition:0.3s;
+}
+
+.nav-center span:hover{
+color:#ffe9b8;
 }
 
 </style>
@@ -69,9 +88,22 @@ border-bottom-color:#ffe9b8;
   <img src="p1_photo1.jpg" alt="photo page 1">
 </div>
 
-<button class="next-btn" onclick="window.location.href='p2.html'">
-next
-</button>
+<div class="nav">
+
+  <!-- NUMÉROS -->
+  <div class="nav-center">
+    <span onclick="window.location.href='p1.html'">1</span> ·
+    <span onclick="window.location.href='p2.html'">2</span> ·
+    <span onclick="window.location.href='p3.html'">3</span> ·
+    <span onclick="window.location.href='p4.html'">4</span>
+  </div>
+
+  <!-- NEXT -->
+  <div class="nav-btn" onclick="window.location.href='p2.html'">
+    next
+  </div>
+
+</div>
 
 </body>
 </html>
